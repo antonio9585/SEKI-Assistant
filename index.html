@@ -28,7 +28,7 @@
     }
 
     header {
-      padding: 1.5rem 2rem;
+      padding: 1.25rem 2rem;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -42,7 +42,7 @@
     .brand h1 { font-size: 1.4rem; letter-spacing: 2px; font-weight: 700; color: var(--text-main); }
     .brand span { color: var(--gold-accent); font-size: 0.8rem; border: 1px solid var(--gold-accent); padding: 2px 6px; border-radius: 4px; }
 
-    .status-bar { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+    .status-bar { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
     .status-badge { background: #1f2937; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; color: var(--text-main); border: 1px solid #374151; }
     .status-indicator { width: 8px; height: 8px; background: var(--emerald-accent); border-radius: 50%; display: inline-block; }
 
@@ -68,7 +68,7 @@
     }
 
     .panel-title {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--text-muted);
@@ -78,7 +78,7 @@
 
     /* Visualizer */
     .visualizer-box {
-      height: 90px;
+      height: 80px;
       background: #0d1322;
       border-radius: 8px;
       display: flex;
@@ -118,7 +118,7 @@
 
     /* Input & List Styles */
     .input-group { display: flex; gap: 0.5rem; }
-    input[type="text"] {
+    input[type="text"], input[type="password"] {
       flex: 1;
       background: #0b1120;
       border: 1px solid var(--border-color);
@@ -126,15 +126,16 @@
       padding: 0.6rem 0.8rem;
       color: var(--text-main);
       outline: none;
+      font-size: 0.85rem;
     }
-    input[type="text"]:focus { border-color: var(--emerald-accent); }
+    input:focus { border-color: var(--emerald-accent); }
 
-    .item-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 180px; overflow-y: auto; }
+    .item-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 140px; overflow-y: auto; }
     .item-list li {
       background: #0b1120;
-      padding: 0.6rem 0.8rem;
+      padding: 0.5rem 0.8rem;
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -151,7 +152,7 @@
     .chat-log {
       flex: 1;
       min-height: 380px;
-      max-height: 520px;
+      max-height: 500px;
       overflow-y: auto;
       background: #0b1120;
       border-radius: 8px;
@@ -162,8 +163,6 @@
     }
     .msg { max-width: 85%; padding: 0.85rem 1.1rem; border-radius: 10px; font-size: 0.95rem; line-height: 1.5; word-break: break-word; }
     .msg.user { align-self: flex-end; background: #1f2937; color: var(--text-main); border: 1px solid #374151; }
-    
-    /* NEW ATTRACTIVE DARK SLATE & GOLD ACCENT CHAT BUBBLE FOR SEKI */
     .msg.seki { 
       align-self: flex-start; 
       background: #131d31; 
@@ -172,6 +171,8 @@
       border-left: 4px solid var(--gold-accent);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
+
+    .engine-tag { font-size: 0.7rem; color: var(--gold-accent); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; display: block; }
 
     .voice-commands-help {
       font-size: 0.8rem;
@@ -194,14 +195,14 @@
       <span>GENIUS AI</span>
     </div>
     <div class="status-bar">
-      <div class="status-badge"><span class="status-indicator"></span><span id="locStatus">Locating area...</span></div>
+      <div class="status-badge"><span class="status-indicator"></span><span id="locStatus">Locating...</span></div>
       <div class="status-badge">🌡️ <span id="weatherStatus">--°C</span></div>
       <div class="status-badge">🕒 <span id="clockDisplay">--:--</span></div>
     </div>
   </header>
 
   <main>
-    <!-- Left Column: Controls, Visualizer, Tasks, Notes -->
+    <!-- Left Column: Settings, Visualizer, Tasks, Notes -->
     <section class="panel">
       <div class="panel-title">Audio Interface</div>
       <div class="visualizer-box">
@@ -211,6 +212,12 @@
       <div class="controls-grid">
         <button id="micBtn" class="btn btn-primary">🎙️ Voice Input</button>
         <button id="briefingBtn" class="btn">⚡ Brief Me</button>
+      </div>
+
+      <div class="panel-title">Gemini AI Key (Optional)</div>
+      <div class="input-group">
+        <input type="password" id="apiKeyInput" placeholder="Paste Gemini API key..." />
+        <button id="saveKeyBtn" class="btn btn-primary">Save</button>
       </div>
 
       <div class="panel-title">Daily Agenda</div>
@@ -233,15 +240,18 @@
       <div class="panel-title">SEKI Intelligence Hub</div>
       
       <div id="chatLog" class="chat-log">
-        <div class="msg seki">System online. Hello! I am SEKI, your intelligent companion. Ask me any general knowledge question, capital cities, history, or command me to open apps!</div>
+        <div class="msg seki">
+          <span class="engine-tag">System Ready</span>
+          Hello! I am SEKI, powered by DuckDuckGo, Wikipedia, and Google Gemini AI. Ask me anything or command me to open apps!
+        </div>
       </div>
 
       <div class="voice-commands-help">
-        💡 <b>Ask me anything:</b> "What is the capital of Somalia?", "Who is Albert Einstein?", "Open WhatsApp", or "Brief me".
+        💡 <b>Multi-Engine Chat:</b> Ask any general question, country facts, definitions, "Open WhatsApp", "Open YouTube", or "Brief me".
       </div>
 
       <div class="input-group">
-        <input type="text" id="userInput" placeholder="Ask SEKI any question or command..." />
+        <input type="text" id="userInput" placeholder="Ask SEKI anything..." />
         <button id="sendBtn" class="btn btn-primary">Send</button>
       </div>
     </section>
@@ -250,6 +260,7 @@
   <script>
     let tasks = JSON.parse(localStorage.getItem('seki_tasks')) || [];
     let notes = JSON.parse(localStorage.getItem('seki_notes')) || [];
+    let geminiKey = localStorage.getItem('seki_gemini_key') || '';
     let userLocation = { city: 'Nairobi', temp: null, coords: null };
     let isListening = false;
 
@@ -267,6 +278,18 @@
     const clockDisplay = document.getElementById('clockDisplay');
     const locStatus = document.getElementById('locStatus');
     const weatherStatus = document.getElementById('weatherStatus');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveKeyBtn = document.getElementById('saveKeyBtn');
+
+    if (geminiKey) apiKeyInput.value = geminiKey;
+
+    saveKeyBtn.addEventListener('click', () => {
+      geminiKey = apiKeyInput.value.trim();
+      localStorage.setItem('seki_gemini_key', geminiKey);
+      const reply = geminiKey ? "Gemini API key saved! Full AI reasoning activated." : "Gemini API key cleared. Switching to DuckDuckGo & Wikipedia engines.";
+      addChatMessage(reply, 'seki', 'Engine Config');
+      speak(reply);
+    });
 
     function updateClock() {
       const now = new Date();
@@ -275,7 +298,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Geolocation & Weather
+    // Geolocation & Reverse Geocoding
     async function fetchLocationAndWeather(lat, lon) {
       try {
         userLocation.coords = { lat, lon };
@@ -304,10 +327,7 @@
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchLocationAndWeather(pos.coords.latitude, pos.coords.longitude),
-        () => {
-          fetchLocationAndWeather(-1.286389, 36.817223);
-          locStatus.textContent = '📍 Nairobi (Default)';
-        }
+        () => fetchLocationAndWeather(-1.286389, 36.817223)
       );
     } else {
       fetchLocationAndWeather(-1.286389, 36.817223);
@@ -316,7 +336,6 @@
     // Audio Visualizer
     const canvas = document.getElementById('audioVisualizer');
     const ctx = canvas.getContext('2d');
-    let animId;
 
     function resizeCanvas() {
       canvas.width = canvas.parentElement.clientWidth;
@@ -344,7 +363,7 @@
         ctx.shadowColor = '#10b981';
         ctx.fillRect(x, centerY - barHeight / 2, barWidth, barHeight);
       }
-      animId = requestAnimationFrame(() => drawVisualizer(active || isListening));
+      requestAnimationFrame(() => drawVisualizer(active || isListening));
     }
     drawVisualizer(false);
 
@@ -397,11 +416,9 @@
       micBtn.textContent = 'Voice Unavail.';
     }
 
-    micBtn.addEventListener('click', () => {
-      if (recognition) recognition.start();
-    });
+    micBtn.addEventListener('click', () => { if (recognition) recognition.start(); });
 
-    // Real Knowledge Search & Command Engine
+    // Multi-Engine Knowledge Processing
     async function handleCommand(rawInput) {
       if (!rawInput.trim()) return;
 
@@ -413,27 +430,27 @@
       if (cmd.includes('open whatsapp')) {
         speak("Opening WhatsApp for you now.");
         window.open('https://web.whatsapp.com', '_blank');
-        return addChatMessage("Opened WhatsApp in a new tab.", 'seki');
+        return addChatMessage("Opened WhatsApp in a new tab.", 'seki', 'App Launcher');
       }
       if (cmd.includes('open youtube')) {
         speak("Opening YouTube.");
         window.open('https://youtube.com', '_blank');
-        return addChatMessage("Opened YouTube.", 'seki');
+        return addChatMessage("Opened YouTube.", 'seki', 'App Launcher');
       }
       if (cmd.includes('open maps') || cmd.includes('open google maps')) {
         speak("Opening Google Maps.");
         window.open('https://maps.google.com', '_blank');
-        return addChatMessage("Opened Google Maps.", 'seki');
+        return addChatMessage("Opened Google Maps.", 'seki', 'App Launcher');
       }
       if (cmd.includes('open spotify')) {
         speak("Opening Spotify.");
         window.open('https://open.spotify.com', '_blank');
-        return addChatMessage("Opened Spotify.", 'seki');
+        return addChatMessage("Opened Spotify.", 'seki', 'App Launcher');
       }
       if (cmd.includes('open gmail') || cmd.includes('open email')) {
         speak("Opening Gmail.");
         window.open('https://mail.google.com', '_blank');
-        return addChatMessage("Opened Gmail.", 'seki');
+        return addChatMessage("Opened Gmail.", 'seki', 'App Launcher');
       }
 
       // Briefing & Agenda
@@ -447,7 +464,7 @@
           tasks.push(t);
           renderList(tasks, taskList, 'seki_tasks');
           const reply = `Task added: ${t}`;
-          addChatMessage(reply, 'seki');
+          addChatMessage(reply, 'seki', 'Agenda Engine');
           speak(reply);
           return;
         }
@@ -457,7 +474,7 @@
         tasks = [];
         renderList(tasks, taskList, 'seki_tasks');
         const reply = "All tasks cleared.";
-        addChatMessage(reply, 'seki');
+        addChatMessage(reply, 'seki', 'Agenda Engine');
         speak(reply);
         return;
       }
@@ -468,7 +485,7 @@
           notes.push(n);
           renderList(notes, noteList, 'seki_notes');
           const reply = `Note saved: ${n}`;
-          addChatMessage(reply, 'seki');
+          addChatMessage(reply, 'seki', 'Scratchpad Engine');
           speak(reply);
           return;
         }
@@ -477,79 +494,77 @@
       // Location & Weather Questions
       if (cmd.includes('where am i') || cmd.includes('my location')) {
         const reply = `You are currently located in ${userLocation.city}. Temperature outside is ${userLocation.temp || 22}°C.`;
-        addChatMessage(reply, 'seki');
+        addChatMessage(reply, 'seki', 'Location Engine');
         speak(reply);
         return;
       }
 
       if (cmd.includes('weather') || cmd.includes('temperature')) {
         const reply = `The weather in ${userLocation.city} is currently around ${userLocation.temp || 22} degrees Celsius.`;
-        addChatMessage(reply, 'seki');
+        addChatMessage(reply, 'seki', 'Weather Engine');
         speak(reply);
         return;
       }
 
-      if (cmd.includes('hello') || cmd.includes('hi') || cmd.includes('hey')) {
-        const hour = new Date().getHours();
-        const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-        const reply = `${greeting}! I'm SEKI, your intelligent companion. Ask me any question about places, people, or facts!`;
-        addChatMessage(reply, 'seki');
-        speak(reply);
-        return;
+      // Engine 1: Gemini API (If Key Present)
+      if (geminiKey) {
+        try {
+          addChatMessage("Querying Gemini AI...", 'seki', 'Gemini Engine');
+          const gemRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: `Answer concisely as SEKI personal assistant: ${rawInput}` }] }] })
+          });
+          const gemData = await gemRes.json();
+          chatLog.lastChild.remove();
+
+          if (gemData.candidates && gemData.candidates[0].content.parts[0].text) {
+            const answer = gemData.candidates[0].content.parts[0].text;
+            addChatMessage(answer, 'seki', 'Gemini AI');
+            speak(answer);
+            return;
+          }
+        } catch (e) {
+          chatLog.lastChild.remove();
+        }
       }
 
-      // Live Knowledge Fetcher (Wikipedia API Integration)
+      // Engine 2: DuckDuckGo Instant Answer API
       try {
-        // Show temporary thinking state
-        const thinkingId = addChatMessage("Searching knowledge base...", 'seki');
-        
-        // Clean query for search
-        let searchQuery = rawInput.replace(/what is the capital of|who is|what is|tell me about|where is/gi, '').trim();
-        if (!searchQuery) searchQuery = rawInput;
+        addChatMessage("Searching knowledge base...", 'seki', 'DuckDuckGo Engine');
+        const ddgRes = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(rawInput)}&format=json&no_html=1&skip_disambig=1`);
+        const ddgData = await ddgRes.json();
 
+        if (ddgData && ddgData.AbstractText) {
+          chatLog.lastChild.remove();
+          const answer = ddgData.AbstractText;
+          addChatMessage(answer, 'seki', 'DuckDuckGo Instant Answer');
+          speak(answer);
+          return;
+        }
+      } catch (e) { }
+
+      // Engine 3: Wikipedia API Fallback
+      try {
+        let searchQuery = rawInput.replace(/what is the capital of|who is|what is|tell me about|where is/gi, '').trim() || rawInput;
         const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchQuery)}`);
         
         if (wikiRes.ok) {
           const wikiData = await wikiRes.json();
           if (wikiData && wikiData.extract) {
-            // Remove previous thinking message
-            chatLog.lastChild.remove();
+            if (chatLog.lastChild.textContent.includes("Searching knowledge base")) chatLog.lastChild.remove();
             const answer = wikiData.extract;
-            addChatMessage(answer, 'seki');
+            addChatMessage(answer, 'seki', 'Wikipedia Knowledge');
             speak(answer);
             return;
           }
         }
+      } catch (e) { }
 
-        // Fallback search query if direct page wasn't found
-        const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(rawInput)}&format=json&origin=*`);
-        const searchData = await searchRes.json();
-        
-        if (searchData && searchData.query && searchData.query.search.length > 0) {
-          const pageTitle = searchData.query.search[0].title;
-          const secondRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
-          const secondData = await secondRes.json();
-          
-          if (secondData && secondData.extract) {
-            chatLog.lastChild.remove();
-            const answer = secondData.extract;
-            addChatMessage(answer, 'seki');
-            speak(answer);
-            return;
-          }
-        }
-
-        // If Wikipedia couldn't find it
-        chatLog.lastChild.remove();
-        const fallback = `I searched my knowledge base for "${rawInput}", but couldn't find an exact match. Try asking about a specific country, city, or notable figure!`;
-        addChatMessage(fallback, 'seki');
-        speak(fallback);
-
-      } catch (err) {
-        const errReply = `I'm connected to your local assistant hub. Ask me about geography, science, history, or people!`;
-        addChatMessage(errReply, 'seki');
-        speak(errReply);
-      }
+      if (chatLog.lastChild.textContent.includes("Searching knowledge base")) chatLog.lastChild.remove();
+      const fallback = `I searched my multi-engine knowledge base for "${rawInput}". Try asking about specific countries, capital cities, people, or paste a Gemini API key for deep reasoning!`;
+      addChatMessage(fallback, 'seki', 'Multi-Engine Hub');
+      speak(fallback);
     }
 
     function generateBriefing() {
@@ -561,20 +576,21 @@
       
       let briefingText = `${timeGreeting}! Here is your briefing. You are currently in ${userLocation.city}. ${tempInfo} You have ${taskCount} active task${taskCount === 1 ? '' : 's'} on your agenda.`;
 
-      if (taskCount > 0) {
-        briefingText += ` Top priority: ${tasks[0]}.`;
-      } else {
-        briefingText += " Your task list is completely clear.";
-      }
+      if (taskCount > 0) briefingText += ` Top priority: ${tasks[0]}.`;
+      else briefingText += " Your task list is completely clear.";
 
-      addChatMessage(briefingText, 'seki');
+      addChatMessage(briefingText, 'seki', 'Daily Briefing');
       speak(briefingText);
     }
 
-    function addChatMessage(msg, sender) {
+    function addChatMessage(msg, sender, engine = 'SEKI') {
       const div = document.createElement('div');
       div.className = `msg ${sender}`;
-      div.textContent = msg;
+      if (sender === 'seki') {
+        div.innerHTML = `<span class="engine-tag">${engine}</span>${msg}`;
+      } else {
+        div.textContent = msg;
+      }
       chatLog.appendChild(div);
       chatLog.scrollTop = chatLog.scrollHeight;
       return div;
