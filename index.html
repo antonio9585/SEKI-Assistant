@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SEKI — Genius Personal Assistant</title>
+  <!-- Custom App Favicon / Taskbar Icon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'><circle cx='12' cy='12' r='10'/></svg>">
   <style>
     :root {
       --bg-dark: #090d16;
@@ -160,7 +162,15 @@
     }
     .msg { max-width: 80%; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
     .msg.user { align-self: flex-end; background: #1e293b; color: var(--text-main); }
-    .msg.seki { align-self: flex-start; background: #064e3b; color: #a7f3d0; border-left: 3px solid var(--emerald-accent); }
+    
+    /* REPLACED GREEN WITH SLEEK EYE-CATCHING VIOLET/INDIGO GRADIENT */
+    .msg.seki { 
+      align-self: flex-start; 
+      background: linear-gradient(135deg, #4f46e5, #6366f1); 
+      color: #ffffff; 
+      border-left: 3px solid var(--gold-accent);
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    }
 
     .voice-commands-help {
       font-size: 0.8rem;
@@ -237,13 +247,11 @@
   </main>
 
   <script>
-    // App State & Local Storage
     let tasks = JSON.parse(localStorage.getItem('seki_tasks')) || [];
     let notes = JSON.parse(localStorage.getItem('seki_notes')) || [];
     let userLocation = { city: 'Nairobi', temp: null, weather: null };
     let isListening = false;
 
-    // DOM Elements
     const micBtn = document.getElementById('micBtn');
     const briefingBtn = document.getElementById('briefingBtn');
     const userInput = document.getElementById('userInput');
@@ -259,7 +267,6 @@
     const locStatus = document.getElementById('locStatus');
     const weatherStatus = document.getElementById('weatherStatus');
 
-    // 1. Clock & Real-time Info
     function updateClock() {
       const now = new Date();
       clockDisplay.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -267,7 +274,6 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 2. Location & Live Weather Integration
     async function fetchWeather(lat = -1.286389, lon = 36.817223, cityName = 'Nairobi') {
       try {
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
@@ -293,7 +299,6 @@
       fetchWeather();
     }
 
-    // 3. Audio Visualizer Canvas
     const canvas = document.getElementById('audioVisualizer');
     const ctx = canvas.getContext('2d');
     let animId;
@@ -328,7 +333,6 @@
     }
     drawVisualizer(false);
 
-    // 4. Voice Synthesis (SEKI Speaks)
     function speak(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -336,7 +340,6 @@
         utterance.rate = 1.0;
         utterance.pitch = 1.05;
 
-        // Try to pick a female/smooth voice
         const voices = window.speechSynthesis.getVoices();
         const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Zira'));
         if (preferredVoice) utterance.voice = preferredVoice;
@@ -347,7 +350,6 @@
       }
     }
 
-    // 5. Speech Recognition & Handlers
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
 
@@ -384,7 +386,6 @@
       if (recognition) recognition.start();
     });
 
-    // 6. Intelligent Command Processing & Voice App Launcher
     function handleCommand(rawInput) {
       if (!rawInput.trim()) return;
 
@@ -392,7 +393,6 @@
       userInput.value = '';
       const cmd = rawInput.toLowerCase().trim();
 
-      // App Launching Commands
       if (cmd.includes('open whatsapp')) {
         speak("Opening WhatsApp for you now.");
         window.open('https://web.whatsapp.com', '_blank');
@@ -419,7 +419,6 @@
         return addChatMessage("Opened Gmail.", 'seki');
       }
 
-      // Feature Triggers
       if (cmd.includes('brief') || cmd.includes('schedule') || cmd.includes('agenda')) {
         return generateBriefing();
       }
@@ -457,7 +456,6 @@
         }
       }
 
-      // Conversational Q&A
       if (cmd.includes('hello') || cmd.includes('hi') || cmd.includes('hey')) {
         const hour = new Date().getHours();
         const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -481,13 +479,11 @@
         return;
       }
 
-      // Default Response
       const defaultReply = `Received: "${rawInput}". Task and voice system ready.`;
       addChatMessage(defaultReply, 'seki');
       speak(defaultReply);
     }
 
-    // 7. Dynamic Briefing Generator
     function generateBriefing() {
       const now = new Date();
       const hour = now.getHours();
@@ -507,7 +503,6 @@
       speak(briefingText);
     }
 
-    // Helpers
     function addChatMessage(msg, sender) {
       const div = document.createElement('div');
       div.className = `msg ${sender}`;
@@ -531,7 +526,6 @@
       if (key === 'seki_notes') { notes.splice(index, 1); renderList(notes, noteList, 'seki_notes'); }
     };
 
-    // Event Listeners
     sendBtn.addEventListener('click', () => handleCommand(userInput.value));
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleCommand(userInput.value); });
     briefingBtn.addEventListener('click', generateBriefing);
@@ -552,7 +546,6 @@
       }
     });
 
-    // Initial render
     renderList(tasks, taskList, 'seki_tasks');
     renderList(notes, noteList, 'seki_notes');
   </script>
