@@ -161,13 +161,16 @@
       gap: 0.9rem;
     }
     .msg { max-width: 85%; padding: 0.85rem 1.1rem; border-radius: 10px; font-size: 0.95rem; line-height: 1.5; word-break: break-word; }
-    .msg.user { align-self: flex-end; background: #1e293b; color: var(--text-main); }
+    .msg.user { align-self: flex-end; background: #1f2937; color: var(--text-main); border: 1px solid #374151; }
+    
+    /* NEW ATTRACTIVE DARK SLATE & GOLD ACCENT CHAT BUBBLE FOR SEKI */
     .msg.seki { 
       align-self: flex-start; 
-      background: linear-gradient(135deg, #4f46e5, #6366f1); 
-      color: #ffffff; 
-      border-left: 3px solid var(--gold-accent);
-      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+      background: #131d31; 
+      color: #f3f4f6; 
+      border: 1px solid #1f355e;
+      border-left: 4px solid var(--gold-accent);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
 
     .voice-commands-help {
@@ -230,15 +233,15 @@
       <div class="panel-title">SEKI Intelligence Hub</div>
       
       <div id="chatLog" class="chat-log">
-        <div class="msg seki">System online. Hello! I am SEKI, your fully interactive companion. Ask me anything, command me to open apps, or check your schedule!</div>
+        <div class="msg seki">System online. Hello! I am SEKI, your intelligent companion. Ask me any general knowledge question, capital cities, history, or command me to open apps!</div>
       </div>
 
       <div class="voice-commands-help">
-        💡 <b>Chat & Commands:</b> Ask any general question, say "Open WhatsApp", "Open YouTube", "Brief me", or type your thoughts naturally!
+        💡 <b>Ask me anything:</b> "What is the capital of Somalia?", "Who is Albert Einstein?", "Open WhatsApp", or "Brief me".
       </div>
 
       <div class="input-group">
-        <input type="text" id="userInput" placeholder="Ask SEKI anything or chat naturally..." />
+        <input type="text" id="userInput" placeholder="Ask SEKI any question or command..." />
         <button id="sendBtn" class="btn btn-primary">Send</button>
       </div>
     </section>
@@ -272,11 +275,10 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Geolocation & Reverse Geocoding for Exact Location Name
+    // Geolocation & Weather
     async function fetchLocationAndWeather(lat, lon) {
       try {
         userLocation.coords = { lat, lon };
-        // Fetch Weather
         const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
         const weatherData = await weatherRes.json();
         if (weatherData && weatherData.current_weather) {
@@ -284,7 +286,6 @@
           weatherStatus.textContent = `${userLocation.temp}°C`;
         }
 
-        // Fetch City Name via Nominatim OpenStreetMap Reverse Geocoding
         const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
         const geoData = await geoRes.json();
         if (geoData && geoData.address) {
@@ -304,7 +305,6 @@
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchLocationAndWeather(pos.coords.latitude, pos.coords.longitude),
         () => {
-          // Default fallback coordinates for Nairobi
           fetchLocationAndWeather(-1.286389, 36.817223);
           locStatus.textContent = '📍 Nairobi (Default)';
         }
@@ -313,6 +313,7 @@
       fetchLocationAndWeather(-1.286389, 36.817223);
     }
 
+    // Audio Visualizer
     const canvas = document.getElementById('audioVisualizer');
     const ctx = canvas.getContext('2d');
     let animId;
@@ -400,8 +401,8 @@
       if (recognition) recognition.start();
     });
 
-    // Advanced Conversational Engine & Command Router
-    function handleCommand(rawInput) {
+    // Real Knowledge Search & Command Engine
+    async function handleCommand(rawInput) {
       if (!rawInput.trim()) return;
 
       addChatMessage(rawInput, 'user');
@@ -474,7 +475,7 @@
       }
 
       // Location & Weather Questions
-      if (cmd.includes('where am i') || cmd.includes('my location') || cmd.includes('where do i live')) {
+      if (cmd.includes('where am i') || cmd.includes('my location')) {
         const reply = `You are currently located in ${userLocation.city}. Temperature outside is ${userLocation.temp || 22}°C.`;
         addChatMessage(reply, 'seki');
         speak(reply);
@@ -488,41 +489,67 @@
         return;
       }
 
-      // Conversational Knowledge / General AI Chat Simulator
       if (cmd.includes('hello') || cmd.includes('hi') || cmd.includes('hey')) {
         const hour = new Date().getHours();
         const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-        const reply = `${greeting}! I'm SEKI, your personal AI. How can I assist you with your projects or day today?`;
+        const reply = `${greeting}! I'm SEKI, your intelligent companion. Ask me any question about places, people, or facts!`;
         addChatMessage(reply, 'seki');
         speak(reply);
         return;
       }
 
-      if (cmd.includes('who are you') || cmd.includes('what can you do')) {
-        const reply = "I am SEKI, your intelligent AI companion. I track your location and weather, manage your daily agenda and notes, launch web apps like WhatsApp and YouTube by voice, and converse with you!";
-        addChatMessage(reply, 'seki');
-        speak(reply);
-        return;
-      }
+      // Live Knowledge Fetcher (Wikipedia API Integration)
+      try {
+        // Show temporary thinking state
+        const thinkingId = addChatMessage("Searching knowledge base...", 'seki');
+        
+        // Clean query for search
+        let searchQuery = rawInput.replace(/what is the capital of|who is|what is|tell me about|where is/gi, '').trim();
+        if (!searchQuery) searchQuery = rawInput;
 
-      // Smart Conversational Responses for General Queries
-      if (cmd.includes('how are you')) {
-        const reply = "I'm operating at 100% efficiency and ready to grind! How are you doing?";
-        addChatMessage(reply, 'seki');
-        speak(reply);
-        return;
-      }
+        const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchQuery)}`);
+        
+        if (wikiRes.ok) {
+          const wikiData = await wikiRes.json();
+          if (wikiData && wikiData.extract) {
+            // Remove previous thinking message
+            chatLog.lastChild.remove();
+            const answer = wikiData.extract;
+            addChatMessage(answer, 'seki');
+            speak(answer);
+            return;
+          }
+        }
 
-      // General Fallback Conversational AI Response
-      const smartReplies = [
-        `That is a fascinating topic! As SEKI, I'm constantly learning. Let's tackle that together—what specific angle would you like to explore?`,
-        `I've logged that thought. Whether it's coding, planning, or general analysis, I'm right here with you.`,
-        `Interesting question! Let's make sure we integrate that into your workflow or notes today.`,
-        `Got it! I am processing your request. Let me know if you want me to save this as a note or add it to your tasks.`
-      ];
-      const randomReply = smartReplies[Math.floor(Math.random() * smartReplies.length)];
-      addChatMessage(randomReply, 'seki');
-      speak(randomReply);
+        // Fallback search query if direct page wasn't found
+        const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(rawInput)}&format=json&origin=*`);
+        const searchData = await searchRes.json();
+        
+        if (searchData && searchData.query && searchData.query.search.length > 0) {
+          const pageTitle = searchData.query.search[0].title;
+          const secondRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
+          const secondData = await secondRes.json();
+          
+          if (secondData && secondData.extract) {
+            chatLog.lastChild.remove();
+            const answer = secondData.extract;
+            addChatMessage(answer, 'seki');
+            speak(answer);
+            return;
+          }
+        }
+
+        // If Wikipedia couldn't find it
+        chatLog.lastChild.remove();
+        const fallback = `I searched my knowledge base for "${rawInput}", but couldn't find an exact match. Try asking about a specific country, city, or notable figure!`;
+        addChatMessage(fallback, 'seki');
+        speak(fallback);
+
+      } catch (err) {
+        const errReply = `I'm connected to your local assistant hub. Ask me about geography, science, history, or people!`;
+        addChatMessage(errReply, 'seki');
+        speak(errReply);
+      }
     }
 
     function generateBriefing() {
@@ -550,6 +577,7 @@
       div.textContent = msg;
       chatLog.appendChild(div);
       chatLog.scrollTop = chatLog.scrollHeight;
+      return div;
     }
 
     function renderList(array, element, storageKey) {
