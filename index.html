@@ -1,809 +1,560 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEKI — Personal AI Assistant</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEKI — Genius Personal Assistant</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --panel-bg: #111827;
+      --emerald-accent: #10b981;
+      --emerald-hover: #059669;
+      --gold-accent: #f59e0b;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-color: #1f2937;
+    }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        sekiBg: '#090d16',
-                        sekiPanel: '#111827',
-                        sekiCard: '#1f2937',
-                        emeraldAccent: '#10b981',
-                        emeraldHover: '#059669',
-                        emeraldGlow: 'rgba(16, 185, 129, 0.25)',
-                        amberAccent: '#f59e0b',
-                        amberGlow: 'rgba(245, 158, 11, 0.2)'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
 
-    <style>
-        body {
-            background-color: #090d16;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 0.8) 0%, transparent 100%);
-            background-attachment: fixed;
-            color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
-        }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* Glassmorphism slate panel */
-        .slate-panel {
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-        }
+    header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(10px);
+    }
 
-        .slate-panel:hover {
-            border-color: rgba(16, 185, 129, 0.3);
-        }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo { width: 14px; height: 14px; background: var(--emerald-accent); border-radius: 50%; box-shadow: 0 0 12px var(--emerald-accent); }
+    .brand h1 { font-size: 1.4rem; letter-spacing: 2px; font-weight: 700; color: var(--text-main); }
+    .brand span { color: var(--gold-accent); font-size: 0.8rem; border: 1px solid var(--gold-accent); padding: 2px 6px; border-radius: 4px; }
 
-        /* Emerald Glow Buttons */
-        .btn-emerald {
-            background-color: #10b981;
-            color: #042f2e;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
-            transition: all 0.2s ease-in-out;
-        }
+    .status-bar { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1.5rem; align-items: center; }
+    .status-indicator { width: 8px; height: 8px; background: var(--emerald-accent); border-radius: 50%; display: inline-block; margin-right: 6px; }
 
-        .btn-emerald:hover {
-            background-color: #059669;
-            color: #ffffff;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
-            transform: translateY(-1px);
-        }
+    main {
+      flex: 1;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
 
-        .btn-amber {
-            background-color: #f59e0b;
-            color: #451a03;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
-            transition: all 0.2s ease-in-out;
-        }
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
 
-        .btn-amber:hover {
-            background-color: #d97706;
-            color: #ffffff;
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-            transform: translateY(-1px);
-        }
+    .panel-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
 
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(16, 185, 129, 0.3);
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(16, 185, 129, 0.6);
-        }
+    /* Visualizer */
+    .visualizer-box {
+      height: 90px;
+      background: #0d1322;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid #1a233a;
+    }
+    canvas#audioVisualizer { width: 100%; height: 100%; }
 
-        /* Voice Wave Visualizer */
-        .wave-bar {
-            animation: wave 1.2s ease-in-out infinite alternate;
-        }
-        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
-        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
-        .wave-bar:nth-child(4) { animation-delay: 0.6s; }
-        .wave-bar:nth-child(5) { animation-delay: 0.8s; }
+    /* Controls */
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .btn {
+      background: var(--border-color);
+      color: var(--text-main);
+      border: 1px solid transparent;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn:hover { background: #374151; }
+    .btn-primary { background: var(--emerald-accent); color: #000; }
+    .btn-primary:hover { background: var(--emerald-hover); }
+    .btn-primary.listening { animation: pulse 1.5s infinite; background: var(--gold-accent); color: #000; }
 
-        @keyframes wave {
-            0% { height: 4px; }
-            100% { height: 26px; }
-        }
-    </style>
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    /* Input & List Styles */
+    .input-group { display: flex; gap: 0.5rem; }
+    input[type="text"] {
+      flex: 1;
+      background: #0b1120;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+      color: var(--text-main);
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--emerald-accent); }
+
+    .item-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 180px; overflow-y: auto; }
+    .item-list li {
+      background: #0b1120;
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item-list li button { background: none; border: none; color: #ef4444; cursor: pointer; }
+
+    /* Chat Log */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .chat-log {
+      flex: 1;
+      min-height: 350px;
+      max-height: 480px;
+      overflow-y: auto;
+      background: #0b1120;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .msg { max-width: 80%; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
+    .msg.user { align-self: flex-end; background: #1e293b; color: var(--text-main); }
+    .msg.seki { align-self: flex-start; background: #064e3b; color: #a7f3d0; border-left: 3px solid var(--emerald-accent); }
+
+    .voice-commands-help {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 0.6rem;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 text-gray-100">
+<body>
 
-    <!-- Header Navigation -->
-    <header class="slate-panel rounded-2xl p-4 sm:p-5 mb-6 flex flex-col lg:flex-row justify-between items-center gap-4">
-        <!-- Logo & Branding -->
-        <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
-            <div class="relative flex items-center justify-center">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-500 via-amber-400 to-emerald-300 p-[2px] shadow-lg shadow-emerald-950/50">
-                    <div class="w-full h-full bg-sekiBg rounded-[10px] flex items-center justify-center">
-                        <i data-lucide="bot" class="w-6 h-6 text-emerald-400"></i>
-                    </div>
-                </div>
-                <div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-sekiBg"></div>
-            </div>
-            <div>
-                <h1 class="text-2xl font-bold font-mono tracking-wider text-emerald-400 flex items-center gap-2">
-                    SEKI
-                    <span class="text-xs font-sans font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">v2.5 Genius</span>
-                </h1>
-                <p class="text-xs text-gray-400 font-mono tracking-widest uppercase">Personal AI Assistant</p>
-            </div>
-            <!-- Mobile Voice Button -->
-            <button id="mobileMicBtn" onclick="toggleVoiceInput()" class="lg:hidden p-3 rounded-xl btn-emerald font-bold">
-                <i data-lucide="mic" class="w-5 h-5"></i>
-            </button>
-        </div>
+  <header>
+    <div class="brand">
+      <div class="brand-logo"></div>
+      <h1>SEKI</h1>
+      <span>GENIUS AI</span>
+    </div>
+    <div class="status-bar">
+      <div><span class="status-indicator"></span><span id="locStatus">Locating...</span></div>
+      <div id="weatherStatus">Temp: --°C</div>
+      <div id="clockDisplay">--:--</div>
+    </div>
+  </header>
 
-        <!-- Control Strip -->
-        <div class="flex flex-wrap items-center justify-center lg:justify-end gap-3 sm:gap-5 w-full lg:w-auto text-sm">
-            <!-- Voice Output Toggle -->
-            <button id="voiceToggleBtn" onclick="toggleSpeechOutput()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60 text-xs font-mono text-emerald-400 hover:border-emerald-500/50 transition">
-                <i data-lucide="volume-2" id="voiceToggleIcon" class="w-4 h-4"></i>
-                <span id="voiceToggleText">Voice Output: ON</span>
-            </button>
+  <main>
+    <!-- Left Column: Controls, Visualizer, Tasks, Notes -->
+    <section class="panel">
+      <div class="panel-title">Audio Interface</div>
+      <div class="visualizer-box">
+        <canvas id="audioVisualizer"></canvas>
+      </div>
 
-            <!-- Time Display -->
-            <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60 font-mono">
-                <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
-                <span id="timeClock" class="font-semibold text-gray-100">00:00:00</span>
-                <span class="text-xs text-gray-400">EAT</span>
-            </div>
+      <div class="controls-grid">
+        <button id="micBtn" class="btn btn-primary">🎙️ Voice Input</button>
+        <button id="briefingBtn" class="btn">⚡ Brief Me</button>
+      </div>
 
-            <!-- Date Display -->
-            <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60 font-mono">
-                <i data-lucide="calendar" class="w-4 h-4 text-emerald-400"></i>
-                <span id="dateDisplay" class="text-gray-200">Loading...</span>
-            </div>
+      <div class="panel-title">Daily Agenda</div>
+      <div class="input-group">
+        <input type="text" id="taskInput" placeholder="New task..." />
+        <button id="addTaskBtn" class="btn btn-primary">+</button>
+      </div>
+      <ul id="taskList" class="item-list"></ul>
 
-            <!-- Voice Engine Selector -->
-            <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60">
-                <i data-lucide="user-voice" class="w-4 h-4 text-amber-400"></i>
-                <select id="voiceSelect" onchange="changeVoice()" class="bg-transparent text-xs text-gray-300 focus:outline-none cursor-pointer max-w-[130px] truncate">
-                    <option value="">Female Voice</option>
-                </select>
-            </div>
-        </div>
-    </header>
+      <div class="panel-title">Scratchpad</div>
+      <div class="input-group">
+        <input type="text" id="noteInput" placeholder="Quick note..." />
+        <button id="addNoteBtn" class="btn">+</button>
+      </div>
+      <ul id="noteList" class="item-list"></ul>
+    </section>
 
-    <!-- Main Grid -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
-        
-        <!-- LEFT COLUMN: Conversational Hub (5 cols) -->
-        <section class="lg:col-span-5 flex flex-col gap-6">
-            
-            <!-- Speech & Status Visualizer -->
-            <div class="slate-panel rounded-2xl p-5 flex flex-col items-center justify-between relative overflow-hidden">
-                <div class="w-full flex justify-between items-center mb-2">
-                    <span class="text-xs font-mono uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Speech Recognition Ready
-                    </span>
-                    <button onclick="clearChatHistory()" class="text-xs text-gray-400 hover:text-red-400 transition flex items-center gap-1">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear Chat
-                    </button>
-                </div>
+    <!-- Right Column: Interactive Chat & Voice Launcher -->
+    <section class="panel chat-container">
+      <div class="panel-title">SEKI Intelligence Hub</div>
+      
+      <div id="chatLog" class="chat-log">
+        <div class="msg seki">System initialized. Hello! I am SEKI, your personal AI assistant. Click "Voice Input" or type below to command me.</div>
+      </div>
 
-                <!-- Central Orb Glow -->
-                <div class="relative my-4 flex items-center justify-center">
-                    <div id="orbGlow" class="w-28 h-28 rounded-full bg-gradient-to-tr from-emerald-600 via-emerald-400 to-amber-400 p-[3px] transition-all duration-500 flex items-center justify-center shadow-lg shadow-emerald-950">
-                        <div class="w-full h-full bg-gray-950 rounded-full flex flex-col items-center justify-center p-3 text-center">
-                            <i data-lucide="sparkles" id="orbIcon" class="w-7 h-7 text-emerald-400 mb-1"></i>
-                            <span id="orbStatus" class="text-[10px] font-mono uppercase tracking-widest text-gray-400">SEKI Listening</span>
-                        </div>
-                    </div>
-                </div>
+      <div class="voice-commands-help">
+        💡 <b>Try Voice Triggers:</b> "Open WhatsApp", "Open YouTube", "Open Google Maps", "Open Spotify", "Brief me", "Add task [item]", "Clear tasks".
+      </div>
 
-                <!-- Animated Wave Bars -->
-                <div id="waveVisualizer" class="flex items-end justify-center gap-1.5 h-7 my-2 opacity-30 transition-opacity">
-                    <div class="wave-bar w-1 bg-emerald-400 rounded-full"></div>
-                    <div class="wave-bar w-1 bg-amber-400 rounded-full"></div>
-                    <div class="wave-bar w-1 bg-emerald-500 rounded-full"></div>
-                    <div class="wave-bar w-1 bg-amber-400 rounded-full"></div>
-                    <div class="wave-bar w-1 bg-emerald-400 rounded-full"></div>
-                </div>
+      <div class="input-group">
+        <input type="text" id="userInput" placeholder="Ask SEKI or issue a command..." />
+        <button id="sendBtn" class="btn btn-primary">Send</button>
+      </div>
+    </section>
+  </main>
 
-                <!-- Voice Controls -->
-                <div class="flex items-center justify-center gap-3 w-full mt-2">
-                    <button id="micToggleBtn" onclick="toggleVoiceInput()" class="flex-1 py-3 px-4 rounded-xl btn-emerald font-semibold text-sm flex items-center justify-center gap-2">
-                        <i data-lucide="mic" class="w-4 h-4"></i>
-                        <span id="micBtnText">Talk to SEKI</span>
-                    </button>
+  <script>
+    // App State & Local Storage
+    let tasks = JSON.parse(localStorage.getItem('seki_tasks')) || [];
+    let notes = JSON.parse(localStorage.getItem('seki_notes')) || [];
+    let userLocation = { city: 'Nairobi', temp: null, weather: null };
+    let isListening = false;
 
-                    <button id="speakBriefingBtn" onclick="generateTimeAwareBriefing(true)" class="py-3 px-4 rounded-xl bg-gray-800 hover:bg-gray-700 text-amber-400 border border-amber-500/30 text-sm font-semibold transition flex items-center justify-center gap-2">
-                        <i data-lucide="volume-2" class="w-4 h-4"></i>
-                        <span>Brief Me</span>
-                    </button>
-                </div>
-            </div>
+    // DOM Elements
+    const micBtn = document.getElementById('micBtn');
+    const briefingBtn = document.getElementById('briefingBtn');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const chatLog = document.getElementById('chatLog');
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+    const noteInput = document.getElementById('noteInput');
+    const addNoteBtn = document.getElementById('addNoteBtn');
+    const noteList = document.getElementById('noteList');
+    const clockDisplay = document.getElementById('clockDisplay');
+    const locStatus = document.getElementById('locStatus');
+    const weatherStatus = document.getElementById('weatherStatus');
 
-            <!-- Chat Window -->
-            <div class="slate-panel rounded-2xl p-5 flex flex-col flex-grow min-h-[420px] max-h-[550px]">
-                <h2 class="text-xs font-semibold text-gray-400 font-mono tracking-wider uppercase mb-3 flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-4 h-4 text-emerald-400"></i> Interactive Chat Console
-                </h2>
+    // 1. Clock & Real-time Info
+    function updateClock() {
+      const now = new Date();
+      clockDisplay.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-                <!-- Scrollable Messages -->
-                <div id="chatMessages" class="flex-grow overflow-y-auto space-y-3 pr-2 mb-4 text-sm">
-                    <!-- Dynamic Messages -->
-                </div>
-
-                <!-- Input Form -->
-                <form id="chatForm" onsubmit="handleUserSubmit(event)" class="flex items-center gap-2 pt-3 border-t border-gray-800">
-                    <input type="text" id="userInput" placeholder="Ask SEKI anything or give a command..." class="flex-grow bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition">
-                    <button type="submit" class="btn-emerald px-4 py-2.5 rounded-xl font-bold flex items-center justify-center">
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- RIGHT COLUMN: Intelligence & Productivity Hub (7 cols) -->
-        <section class="lg:col-span-7 flex flex-col gap-6">
-
-            <!-- Context Briefing Card -->
-            <div class="slate-panel rounded-2xl p-5 relative overflow-hidden">
-                <div class="flex justify-between items-center mb-3">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="sun" id="briefingIcon" class="w-5 h-5 text-amber-400"></i>
-                        <h2 id="briefingTitle" class="text-base font-semibold text-gray-100">Daily Intelligence Briefing</h2>
-                    </div>
-                    <button onclick="generateTimeAwareBriefing(false)" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
-                    </button>
-                </div>
-                <div id="briefingText" class="text-sm text-gray-300 leading-relaxed bg-gray-900/60 p-4 rounded-xl border border-gray-800">
-                    Generating SEKI intelligence report...
-                </div>
-            </div>
-
-            <!-- Task Board & Schedule Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- Task Board -->
-                <div class="slate-panel rounded-2xl p-5 flex flex-col h-[380px]">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-gray-300 flex items-center gap-2">
-                            <i data-lucide="check-square" class="w-4 h-4 text-emerald-400"></i> Active Tasks
-                        </h3>
-                        <span id="taskCount" class="text-xs font-mono px-2 py-0.5 rounded-full bg-gray-900 text-emerald-400 border border-emerald-500/30">0 Left</span>
-                    </div>
-
-                    <!-- Input -->
-                    <div class="flex gap-2 mb-3">
-                        <input type="text" id="taskInput" placeholder="New goal or task..." class="flex-grow bg-gray-900/80 border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-emerald-500">
-                        <button onclick="addTaskFromInput()" class="btn-emerald px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- List -->
-                    <div id="taskList" class="flex-grow overflow-y-auto space-y-2 pr-1">
-                        <!-- Tasks -->
-                    </div>
-
-                    <button onclick="clearCompletedTasks()" class="mt-3 text-[11px] text-gray-500 hover:text-gray-300 text-center transition">
-                        Clear Completed Tasks
-                    </button>
-                </div>
-
-                <!-- Schedule Planner -->
-                <div class="slate-panel rounded-2xl p-5 flex flex-col h-[380px]">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-semibold font-mono uppercase tracking-wider text-gray-300 flex items-center gap-2">
-                            <i data-lucide="calendar-days" class="w-4 h-4 text-amber-400"></i> Today's Schedule
-                        </h3>
-                        <span id="eventCount" class="text-xs font-mono px-2 py-0.5 rounded-full bg-gray-900 text-amber-400 border border-amber-500/30">0 Events</span>
-                    </div>
-
-                    <!-- Input -->
-                    <div class="grid grid-cols-3 gap-1.5 mb-3">
-                        <input type="time" id="eventTime" class="bg-gray-900/80 border border-gray-800 rounded-lg px-2 py-1 text-xs text-gray-200 focus:outline-none focus:border-amber-500">
-                        <input type="text" id="eventTitle" placeholder="Event description..." class="col-span-2 bg-gray-900/80 border border-gray-800 rounded-lg px-3 py-1 text-xs text-gray-200 focus:outline-none focus:border-amber-500">
-                    </div>
-                    <button onclick="addEventFromInput()" class="w-full bg-gray-800 hover:bg-gray-700 text-amber-400 border border-amber-500/40 py-1.5 rounded-lg text-xs font-semibold mb-3 transition">
-                        + Schedule Event
-                    </button>
-
-                    <!-- List -->
-                    <div id="eventList" class="flex-grow overflow-y-auto space-y-2 pr-1">
-                        <!-- Events -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes & Thought Panel -->
-            <div class="slate-panel rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <!-- Scratchpad -->
-                <div class="w-full md:w-1/2 flex flex-col gap-2">
-                    <label for="quickNotes" class="text-xs font-mono text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i> Persistent Scratchpad
-                    </label>
-                    <textarea id="quickNotes" oninput="saveNotes()" placeholder="Jot down quick thoughts or reminders..." class="w-full h-20 bg-gray-900/70 border border-gray-800 rounded-xl p-3 text-xs text-gray-200 focus:outline-none focus:border-amber-500/50 resize-none"></textarea>
-                </div>
-
-                <!-- Quote Card -->
-                <div class="w-full md:w-1/2 bg-gray-900/50 border border-gray-800 rounded-xl p-4 flex flex-col justify-between h-full">
-                    <div class="text-xs text-gray-400 font-mono flex items-center justify-between mb-2">
-                        <span class="flex items-center gap-1"><i data-lucide="quote" class="w-3.5 h-3.5 text-emerald-400"></i> Daily Thought</span>
-                        <button onclick="rotateQuote()" class="hover:text-emerald-400 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>
-                    </div>
-                    <p id="quoteText" class="text-xs italic text-gray-300 leading-relaxed">"Focus on being productive instead of busy."</p>
-                    <span id="quoteAuthor" class="text-[10px] font-mono text-emerald-400 text-right mt-2 block">— Tim Ferriss</span>
-                </div>
-            </div>
-
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="mt-6 text-center text-xs text-gray-500 font-mono py-2">
-        SEKI Intelligence System &bull; Genius Slate Theme &bull; <span class="text-emerald-400">Active</span>
-    </footer>
-
-    <!-- LOGIC -->
-    <script>
-        // Data State
-        let tasks = JSON.parse(localStorage.getItem('seki_tasks')) || [
-            { id: 1, text: 'Review daily priority goals', completed: false },
-            { id: 2, text: 'Morning workout & hydration', completed: true }
-        ];
-
-        let events = JSON.parse(localStorage.getItem('seki_events')) || [
-            { id: 1, time: '09:00', title: 'Daily Sync & Briefing' },
-            { id: 2, time: '14:00', title: 'Deep Work Session' }
-        ];
-
-        let chatHistory = JSON.parse(localStorage.getItem('seki_chat_history')) || [];
-        let speechOutputEnabled = JSON.parse(localStorage.getItem('seki_speech_enabled')) ?? true;
-
-        const quotes = [
-            { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-            { text: "Focus on being productive instead of busy.", author: "Tim Ferriss" },
-            { text: "Action is the foundational key to all success.", author: "Pablo Picasso" },
-            { text: "Your future is created by what you do today, not tomorrow.", author: "Robert Kiyosaki" },
-            { text: "Small deeds done are better than great deeds planned.", author: "Peter Marshall" }
-        ];
-
-        // Speech Engine
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null;
-        let isListening = false;
-        let synth = window.speechSynthesis;
-        let femaleVoice = null;
-
-        function loadVoices() {
-            if (!synth) return;
-            const voices = synth.getVoices();
-            const voiceSelect = document.getElementById('voiceSelect');
-            voiceSelect.innerHTML = '<option value="">Female Voice</option>';
-
-            const preferred = voices.filter(v => 
-                v.name.includes('Female') || 
-                v.name.includes('Samantha') || 
-                v.name.includes('Victoria') || 
-                v.name.includes('Zira') || 
-                v.name.includes('Google US English') ||
-                v.name.includes('Google UK English Female') ||
-                v.name.includes('Karen') ||
-                v.name.includes('Moira')
-            );
-
-            const displayList = preferred.length > 0 ? preferred : voices;
-
-            displayList.forEach((v) => {
-                const opt = document.createElement('option');
-                opt.value = v.name;
-                opt.textContent = `${v.name} (${v.lang})`;
-                voiceSelect.appendChild(opt);
-            });
-
-            if (displayList.length > 0) femaleVoice = displayList[0];
+    // 2. Location & Live Weather Integration
+    async function fetchWeather(lat = -1.286389, lon = 36.817223, cityName = 'Nairobi') {
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const data = await res.json();
+        if (data && data.current_weather) {
+          const temp = Math.round(data.current_weather.temperature);
+          userLocation = { city: cityName, temp: temp, weather: 'Clear' };
+          locStatus.textContent = cityName;
+          weatherStatus.textContent = `${temp}°C`;
         }
+      } catch (err) {
+        locStatus.textContent = cityName;
+        weatherStatus.textContent = '22°C';
+      }
+    }
 
-        if (synth) {
-            loadVoices();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = loadVoices;
-            }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude, 'Local Area'),
+        () => fetchWeather()
+      );
+    } else {
+      fetchWeather();
+    }
+
+    // 3. Audio Visualizer Canvas
+    const canvas = document.getElementById('audioVisualizer');
+    const ctx = canvas.getContext('2d');
+    let animId;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawVisualizer(active = false) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerY = height / 2;
+      const bars = 30;
+
+      for (let i = 0; i < bars; i++) {
+        const barWidth = 4;
+        const x = (width / bars) * i + 8;
+        let barHeight = active 
+          ? Math.sin(Date.now() * 0.005 + i * 0.3) * (height / 3) + (Math.random() * 15 + 10)
+          : Math.sin(Date.now() * 0.002 + i * 0.2) * 4 + 4;
+
+        ctx.fillStyle = active ? '#10b981' : '#1f2937';
+        ctx.shadowBlur = active ? 10 : 0;
+        ctx.shadowColor = '#10b981';
+        ctx.fillRect(x, centerY - barHeight / 2, barWidth, barHeight);
+      }
+      animId = requestAnimationFrame(() => drawVisualizer(active || isListening));
+    }
+    drawVisualizer(false);
+
+    // 4. Voice Synthesis (SEKI Speaks)
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.05;
+
+        // Try to pick a female/smooth voice
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Zira'));
+        if (preferredVoice) utterance.voice = preferredVoice;
+
+        drawVisualizer(true);
+        utterance.onend = () => drawVisualizer(false);
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // 5. Speech Recognition & Handlers
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isListening = true;
+        micBtn.classList.add('listening');
+        micBtn.textContent = 'Listening...';
+        drawVisualizer(true);
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        micBtn.classList.remove('listening');
+        micBtn.textContent = '🎙️ Voice Input';
+        drawVisualizer(false);
+      };
+
+      recognition.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        userInput.value = text;
+        handleCommand(text);
+      };
+    } else {
+      micBtn.disabled = true;
+      micBtn.textContent = 'Voice Unavail.';
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (recognition) recognition.start();
+    });
+
+    // 6. Intelligent Command Processing & Voice App Launcher
+    function handleCommand(rawInput) {
+      if (!rawInput.trim()) return;
+
+      addChatMessage(rawInput, 'user');
+      userInput.value = '';
+      const cmd = rawInput.toLowerCase().trim();
+
+      // App Launching Commands
+      if (cmd.includes('open whatsapp')) {
+        speak("Opening WhatsApp for you now.");
+        window.open('https://web.whatsapp.com', '_blank');
+        return addChatMessage("Opened WhatsApp in a new tab.", 'seki');
+      }
+      if (cmd.includes('open youtube')) {
+        speak("Opening YouTube.");
+        window.open('https://youtube.com', '_blank');
+        return addChatMessage("Opened YouTube.", 'seki');
+      }
+      if (cmd.includes('open maps') || cmd.includes('open google maps')) {
+        speak("Opening Google Maps.");
+        window.open('https://maps.google.com', '_blank');
+        return addChatMessage("Opened Google Maps.", 'seki');
+      }
+      if (cmd.includes('open spotify')) {
+        speak("Opening Spotify.");
+        window.open('https://open.spotify.com', '_blank');
+        return addChatMessage("Opened Spotify.", 'seki');
+      }
+      if (cmd.includes('open gmail') || cmd.includes('open email')) {
+        speak("Opening Gmail.");
+        window.open('https://mail.google.com', '_blank');
+        return addChatMessage("Opened Gmail.", 'seki');
+      }
+
+      // Feature Triggers
+      if (cmd.includes('brief') || cmd.includes('schedule') || cmd.includes('agenda')) {
+        return generateBriefing();
+      }
+
+      if (cmd.startsWith('add task')) {
+        const t = rawInput.replace(/add task/i, '').trim();
+        if (t) {
+          tasks.push(t);
+          renderList(tasks, taskList, 'seki_tasks');
+          const reply = `Task added: ${t}`;
+          addChatMessage(reply, 'seki');
+          speak(reply);
+          return;
         }
+      }
 
-        function changeVoice() {
-            const selectedName = document.getElementById('voiceSelect').value;
-            const voices = synth.getVoices();
-            femaleVoice = voices.find(v => v.name === selectedName) || voices[0];
+      if (cmd.includes('clear tasks')) {
+        tasks = [];
+        renderList(tasks, taskList, 'seki_tasks');
+        const reply = "All tasks cleared.";
+        addChatMessage(reply, 'seki');
+        speak(reply);
+        return;
+      }
+
+      if (cmd.startsWith('add note')) {
+        const n = rawInput.replace(/add note/i, '').trim();
+        if (n) {
+          notes.push(n);
+          renderList(notes, noteList, 'seki_notes');
+          const reply = `Note saved: ${n}`;
+          addChatMessage(reply, 'seki');
+          speak(reply);
+          return;
         }
+      }
 
-        function toggleSpeechOutput() {
-            speechOutputEnabled = !speechOutputEnabled;
-            localStorage.setItem('seki_speech_enabled', JSON.stringify(speechOutputEnabled));
-            
-            const btnText = document.getElementById('voiceToggleText');
-            const btn = document.getElementById('voiceToggleBtn');
+      // Conversational Q&A
+      if (cmd.includes('hello') || cmd.includes('hi') || cmd.includes('hey')) {
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+        const reply = `${greeting}! I am ready for your commands. What are we grinding on today?`;
+        addChatMessage(reply, 'seki');
+        speak(reply);
+        return;
+      }
 
-            if (speechOutputEnabled) {
-                btnText.textContent = 'Voice Output: ON';
-                btn.className = 'flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60 text-xs font-mono text-emerald-400 hover:border-emerald-500/50 transition';
-            } else {
-                if (synth && synth.speaking) synth.cancel();
-                btnText.textContent = 'Voice Output: OFF';
-                btn.className = 'flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60 text-xs font-mono text-gray-400 hover:border-gray-700 transition';
-            }
-        }
+      if (cmd.includes('who are you') || cmd.includes('your name')) {
+        const reply = "I am SEKI, your personal AI assistant built for productivity, tracking, and seamless voice interaction.";
+        addChatMessage(reply, 'seki');
+        speak(reply);
+        return;
+      }
 
-        function speakText(text) {
-            if (!synth || !speechOutputEnabled) return;
-            if (synth.speaking) synth.cancel();
+      if (cmd.includes('weather') || cmd.includes('temperature')) {
+        const reply = `Currently in ${userLocation.city}, it is ${userLocation.temp || 22} degrees Celsius.`;
+        addChatMessage(reply, 'seki');
+        speak(reply);
+        return;
+      }
 
-            const utterance = new SpeechSynthesisUtterance(text);
-            if (femaleVoice) utterance.voice = femaleVoice;
-            utterance.pitch = 1.05;
-            utterance.rate = 0.98;
+      // Default Response
+      const defaultReply = `Received: "${rawInput}". Task and voice system ready.`;
+      addChatMessage(defaultReply, 'seki');
+      speak(defaultReply);
+    }
 
-            utterance.onstart = () => setOrbStatus('SEKI Speaking...', true);
-            utterance.onend = () => setOrbStatus('SEKI Ready', false);
+    // 7. Dynamic Briefing Generator
+    function generateBriefing() {
+      const now = new Date();
+      const hour = now.getHours();
+      const timeGreeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+      const taskCount = tasks.length;
+      const tempInfo = userLocation.temp ? `The current temperature in ${userLocation.city} is ${userLocation.temp} degrees Celsius.` : '';
+      
+      let briefingText = `${timeGreeting}! Here is your daily briefing. ${tempInfo} You have ${taskCount} active task${taskCount === 1 ? '' : 's'} on your agenda.`;
 
-            synth.speak(utterance);
-        }
+      if (taskCount > 0) {
+        briefingText += ` Top priority is: ${tasks[0]}.`;
+      } else {
+        briefingText += " Your task list is clear and ready for new goals.";
+      }
 
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
+      addChatMessage(briefingText, 'seki');
+      speak(briefingText);
+    }
 
-            recognition.onstart = () => {
-                isListening = true;
-                updateMicUI(true);
-                setOrbStatus('SEKI Listening...', true);
-            };
+    // Helpers
+    function addChatMessage(msg, sender) {
+      const div = document.createElement('div');
+      div.className = `msg ${sender}`;
+      div.textContent = msg;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('userInput').value = transcript;
-                handleUserSubmission(transcript);
-            };
+    function renderList(array, element, storageKey) {
+      element.innerHTML = '';
+      array.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item}</span><button onclick="removeItem('${storageKey}', ${index})">✕</button>`;
+        element.appendChild(li);
+      });
+      localStorage.setItem(storageKey, JSON.stringify(array));
+    }
 
-            recognition.onerror = () => stopListening();
-            recognition.onend = () => stopListening();
-        }
+    window.removeItem = function(key, index) {
+      if (key === 'seki_tasks') { tasks.splice(index, 1); renderList(tasks, taskList, 'seki_tasks'); }
+      if (key === 'seki_notes') { notes.splice(index, 1); renderList(notes, noteList, 'seki_notes'); }
+    };
 
-        function toggleVoiceInput() {
-            if (!SpeechRecognition) {
-                appendChatMessage('SEKI', 'Speech recognition is not supported in this browser.');
-                return;
-            }
-            if (isListening) {
-                recognition.stop();
-                stopListening();
-            } else {
-                recognition.start();
-            }
-        }
+    // Event Listeners
+    sendBtn.addEventListener('click', () => handleCommand(userInput.value));
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleCommand(userInput.value); });
+    briefingBtn.addEventListener('click', generateBriefing);
 
-        function stopListening() {
-            isListening = false;
-            updateMicUI(false);
-            setOrbStatus('SEKI Ready', false);
-        }
+    addTaskBtn.addEventListener('click', () => {
+      if (taskInput.value.trim()) {
+        tasks.push(taskInput.value.trim());
+        renderList(tasks, taskList, 'seki_tasks');
+        taskInput.value = '';
+      }
+    });
 
-        function updateMicUI(listening) {
-            const btnText = document.getElementById('micBtnText');
-            const micBtn = document.getElementById('micToggleBtn');
-            if (listening) {
-                btnText.textContent = 'Listening...';
-                micBtn.className = 'flex-1 py-3 px-4 rounded-xl btn-amber font-semibold text-sm flex items-center justify-center gap-2';
-            } else {
-                btnText.textContent = 'Talk to SEKI';
-                micBtn.className = 'flex-1 py-3 px-4 rounded-xl btn-emerald font-semibold text-sm flex items-center justify-center gap-2';
-            }
-        }
+    addNoteBtn.addEventListener('click', () => {
+      if (noteInput.value.trim()) {
+        notes.push(noteInput.value.trim());
+        renderList(notes, noteList, 'seki_notes');
+        noteInput.value = '';
+      }
+    });
 
-        function setOrbStatus(statusText, waveActive) {
-            document.getElementById('orbStatus').textContent = statusText;
-            const wave = document.getElementById('waveVisualizer');
-            if (waveActive) {
-                wave.classList.remove('opacity-30');
-                wave.classList.add('opacity-100');
-            } else {
-                wave.classList.remove('opacity-100');
-                wave.classList.add('opacity-30');
-            }
-        }
-
-        // Chat Dialogue Logic
-        function handleUserSubmit(e) {
-            e.preventDefault();
-            const inputEl = document.getElementById('userInput');
-            const text = inputEl.value.trim();
-            if (!text) return;
-
-            inputEl.value = '';
-            handleUserSubmission(text);
-        }
-
-        function handleUserSubmission(text) {
-            appendChatMessage('You', text);
-            const lower = text.toLowerCase().trim();
-            let response = "";
-
-            if (lower.includes("how are you") || lower.includes("how's it going")) {
-                const choices = [
-                    "I'm feeling crisp and fully operational! How is your day going?",
-                    "Doing wonderful! I'm ready to keep your schedule sharp. How are you feeling today?",
-                    "All systems are running smoothly. What can we accomplish together today?"
-                ];
-                response = choices[Math.floor(Math.random() * choices.length)];
-            }
-            else if (lower.includes("who are you") || lower.includes("your name")) {
-                response = "I am SEKI, your personal AI daily assistant. I help keep your goals, tasks, and schedule perfectly aligned!";
-            }
-            else if (lower.includes("how is the day going") || lower.includes("how is my day")) {
-                const pending = tasks.filter(t => !t.completed).length;
-                response = `Your day is moving along! You currently have ${pending} task${pending === 1 ? '' : 's'} remaining on your list.`;
-            }
-            else if (lower.includes("time") || lower.includes("what time")) {
-                const now = new Date();
-                response = `It is currently ${now.toLocaleTimeString()}.`;
-            }
-            else if (lower.includes("joke")) {
-                const jokes = [
-                    "Why do programmers prefer dark mode? Because light attracts bugs!",
-                    "There are 10 types of people in the world: those who understand binary, and those who don't.",
-                    "Why was the JavaScript developer sad? Because he didn't Node how to Express himself!"
-                ];
-                response = jokes[Math.floor(Math.random() * jokes.length)];
-            }
-            else if (lower.startsWith("add task") || lower.startsWith("create task")) {
-                const taskText = text.replace(/add task|create task/i, "").trim();
-                if (taskText) {
-                    addTask(taskText);
-                    response = `Added "${taskText}" to your task board.`;
-                } else {
-                    response = "What task would you like me to add?";
-                }
-            }
-            else if (lower.includes("briefing") || lower.includes("brief me")) {
-                generateTimeAwareBriefing(true);
-                return;
-            }
-            else if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
-                response = "Hello! Ready when you are. How can SEKI assist you right now?";
-            }
-            else {
-                response = `Noted! I'm keeping track of everything for you. Let me know if you need to add a task or schedule an event!`;
-            }
-
-            setTimeout(() => {
-                appendChatMessage('SEKI', response);
-                speakText(response);
-            }, 300);
-        }
-
-        function appendChatMessage(sender, text) {
-            const container = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'flex gap-3 items-start';
-
-            const isUser = sender === 'You';
-            const iconBg = isUser ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' : 'bg-amber-500/20 border-amber-500/40 text-amber-400';
-            const iconName = isUser ? 'user' : 'bot';
-
-            msgDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-lg ${iconBg} border flex items-center justify-center shrink-0 mt-0.5">
-                    <i data-lucide="${iconName}" class="w-4 h-4"></i>
-                </div>
-                <div class="bg-gray-900/90 border border-gray-800 rounded-2xl ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'} p-3 max-w-[85%] text-gray-200">
-                    <div class="text-[10px] font-mono text-gray-400 mb-1">${sender}</div>
-                    <div>${text}</div>
-                </div>
-            `;
-
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-            lucide.createIcons();
-
-            chatHistory.push({ sender, text });
-            if (chatHistory.length > 50) chatHistory.shift();
-            localStorage.setItem('seki_chat_history', JSON.stringify(chatHistory));
-        }
-
-        function loadChatHistory() {
-            const container = document.getElementById('chatMessages');
-            container.innerHTML = '';
-
-            if (chatHistory.length === 0) {
-                appendChatMessage('SEKI', "Hello! I am **SEKI**, your personal AI assistant. Ask me how I'm doing, command me to add tasks, or click **Brief Me** for your daily report!");
-            } else {
-                chatHistory.forEach(msg => appendChatMessage(msg.sender, msg.text));
-            }
-        }
-
-        function clearChatHistory() {
-            chatHistory = [];
-            localStorage.removeItem('seki_chat_history');
-            document.getElementById('chatMessages').innerHTML = '';
-            appendChatMessage('SEKI', 'Chat dialogue reset. How can I assist you now?');
-        }
-
-        // Briefing Generator
-        function generateTimeAwareBriefing(readAloud = false) {
-            const now = new Date();
-            const hour = now.getHours();
-            let greeting = "Good Morning";
-
-            if (hour >= 12 && hour < 18) greeting = "Good Afternoon";
-            else if (hour >= 18) greeting = "Good Evening";
-
-            const pendingTasks = tasks.filter(t => !t.completed).length;
-            const totalEvents = events.length;
-
-            document.getElementById('briefingTitle').textContent = `${greeting} Briefing`;
-
-            const message = `${greeting}! SEKI reports ${pendingTasks} active task${pendingTasks === 1 ? '' : 's'} remaining and ${totalEvents} event${totalEvents === 1 ? '' : 's'} on your schedule today. Stay focused and have a great day!`;
-
-            document.getElementById('briefingText').textContent = message;
-
-            if (readAloud) {
-                appendChatMessage('SEKI', message);
-                speakText(message);
-            }
-        }
-
-        // Tasks & Events Logic
-        function renderTasks() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-
-            const pending = tasks.filter(t => !t.completed).length;
-            document.getElementById('taskCount').textContent = `${pending} Left`;
-
-            tasks.forEach(t => {
-                const item = document.createElement('div');
-                item.className = `flex items-center justify-between p-2.5 rounded-xl border transition ${t.completed ? 'bg-gray-900/30 border-gray-800/40 opacity-50' : 'bg-gray-900/80 border-gray-800 hover:border-emerald-500/40'}`;
-                
-                item.innerHTML = `
-                    <div class="flex items-center gap-2.5 overflow-hidden">
-                        <button onclick="toggleTask(${t.id})" class="w-5 h-5 rounded-md border ${t.completed ? 'bg-emerald-500 border-emerald-500 text-gray-950' : 'border-gray-600'} flex items-center justify-center shrink-0">
-                            ${t.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>' : ''}
-                        </button>
-                        <span class="text-xs text-gray-200 truncate ${t.completed ? 'line-through text-gray-500' : ''}">${t.text}</span>
-                    </div>
-                    <button onclick="deleteTask(${t.id})" class="text-gray-500 hover:text-red-400 text-xs ml-2">
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                    </button>
-                `;
-                list.appendChild(item);
-            });
-
-            lucide.createIcons();
-            localStorage.setItem('seki_tasks', JSON.stringify(tasks));
-        }
-
-        function addTaskFromInput() {
-            const input = document.getElementById('taskInput');
-            if (input.value.trim()) {
-                addTask(input.value.trim());
-                input.value = '';
-            }
-        }
-
-        function addTask(text) {
-            tasks.push({ id: Date.now(), text, completed: false });
-            renderTasks();
-            generateTimeAwareBriefing(false);
-        }
-
-        function toggleTask(id) {
-            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-            renderTasks();
-            generateTimeAwareBriefing(false);
-        }
-
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            renderTasks();
-            generateTimeAwareBriefing(false);
-        }
-
-        function clearCompletedTasks() {
-            tasks = tasks.filter(t => !t.completed);
-            renderTasks();
-            generateTimeAwareBriefing(false);
-        }
-
-        function renderEvents() {
-            const list = document.getElementById('eventList');
-            list.innerHTML = '';
-            document.getElementById('eventCount').textContent = `${events.length} Events`;
-
-            events.sort((a, b) => a.time.localeCompare(b.time));
-
-            events.forEach(e => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 hover:border-amber-500/40 transition';
-                
-                item.innerHTML = `
-                    <div class="flex items-center gap-2.5 overflow-hidden">
-                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 shrink-0">${e.time}</span>
-                        <span class="text-xs text-gray-200 truncate">${e.title}</span>
-                    </div>
-                    <button onclick="deleteEvent(${e.id})" class="text-gray-500 hover:text-red-400 text-xs ml-2">
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                    </button>
-                `;
-                list.appendChild(item);
-            });
-
-            lucide.createIcons();
-            localStorage.setItem('seki_events', JSON.stringify(events));
-        }
-
-        function addEventFromInput() {
-            const time = document.getElementById('eventTime').value;
-            const title = document.getElementById('eventTitle').value.trim();
-            if (time && title) {
-                events.push({ id: Date.now(), time, title });
-                document.getElementById('eventTitle').value = '';
-                renderEvents();
-                generateTimeAwareBriefing(false);
-            }
-        }
-
-        function deleteEvent(id) {
-            events = events.filter(e => e.id !== id);
-            renderEvents();
-            generateTimeAwareBriefing(false);
-        }
-
-        function loadNotes() {
-            const saved = localStorage.getItem('seki_notes');
-            if (saved) document.getElementById('quickNotes').value = saved;
-        }
-
-        function saveNotes() {
-            localStorage.setItem('seki_notes', document.getElementById('quickNotes').value);
-        }
-
-        function rotateQuote() {
-            const r = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('quoteText').textContent = `"${r.text}"`;
-            document.getElementById('quoteAuthor').textContent = `— ${r.author}`;
-        }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('timeClock').textContent = now.toLocaleTimeString('en-US', { hour12: false });
-            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        window.onload = function() {
-            setInterval(updateClock, 1000);
-            updateClock();
-            loadChatHistory();
-            renderTasks();
-            renderEvents();
-            loadNotes();
-            generateTimeAwareBriefing(false);
-            lucide.createIcons();
-
-            if (!speechOutputEnabled) {
-                document.getElementById('voiceToggleText').textContent = 'Voice Output: OFF';
-                document.getElementById('voiceToggleBtn').className = 'flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-900/80 border border-gray-700/60 text-xs font-mono text-gray-400 hover:border-gray-700 transition';
-            }
-        };
-    </script>
+    // Initial render
+    renderList(tasks, taskList, 'seki_tasks');
+    renderList(notes, noteList, 'seki_notes');
+  </script>
 </body>
 </html>
