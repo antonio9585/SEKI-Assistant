@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SEKI — Genius Personal Assistant</title>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#10b981">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'><circle cx='12' cy='12' r='10'/></svg>">
   <style>
     :root {
@@ -633,6 +635,14 @@
 
     renderList(tasks, taskList, 'seki_tasks');
     renderList(notes, noteList, 'seki_notes');
+    // Register PWA Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SEKI PWA registered successfully!'))
+      .catch((err) => console.log('PWA registration failed:', err));
+  });
+}
   </script>
 </body>
 </html>
